@@ -1,0 +1,68 @@
+﻿<div class="container mt-12">
+    <div style="display:flex; flex-direction: column;">
+        @using (Html.BeginForm("RegenerateUsers", "Home"))
+        {
+            <p>Количество ошибок:</p>
+            <input type="range" name="amountRange" min="0" max="10" value="@DataGenerator.countErrorToString" step="0.25" oninput="this.form.amountInput.value=this.value" onchange="form.submit();"/>
+            <input type="number" name="amountInput" min="0" max="1000" value="@(DataGenerator.CountError)" oninput="this.form.amountRange.value=this.value" onchange="form.submit();" />
+            <br />
+             <p>Seed:</p>
+            <input type="number" name="seed" min="0" value="@DataGenerator.Seed" style="width: 26.5em; height: 2.5em" id="seed" onchange="form.submit();"/>
+            <button class="btn btn-primary" onclick="setRandomSeed();">Random</button>
+            <br />
+            <p>Выберите регион:</p>
+            <select value="@DataGenerator.Region" onchange="form.submit();" name="region">
+                <option value="@("ru")">Русский / Россия</option>
+                <option value="@("ua")">Yкраїнський / Україна</option>
+                <option value="@("be")">Беларускi / Беларусь</option>
+            </select>
+        }
+    </div>
+    @if (DataGenerator.Users != null && DataGenerator.Users.Count > 0)
+    {
+        <div style="height:390px;overflow: auto;" onscroll="setNewUsers();">
+            <table class="table table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in DataGenerator.Users)
+                    {
+                        <tr>
+                            <td>@user.Number</td>
+                            <td>@user.Id</td>
+                            <td>@user.Name</td>
+                            <td>@user.Address</td>
+                            <td>@user.Phone</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+<script>
+    function setRandomSeed() {
+        document.getElementById('seed').value = Math.floor(Math.random() * 10000);
+    };
+    function setNewUsers() {
+        let windowRelativeBottom = document.getElementById('myTable').getBoundingClientRect().bottom;
+        if (windowRelativeBottom - document.getElementById('myTable').scrollTop < 700)
+        {
+            $.ajax({
+                url: "/Home/GenerateNewUsers",
+                method: 'GET',
+                dataType: 'html',
+                success: function (users) {
+                    document.getElementById('myTable').insertAdjacentHTML("beforeend", users);
+                },
+            });
+        }
+    }
+</script>
