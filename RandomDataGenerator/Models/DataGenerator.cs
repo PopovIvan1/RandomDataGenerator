@@ -9,7 +9,7 @@ namespace RandomDataGenerator.Models
 {
     public static class DataGenerator
     {
-        public static string? Region { get; set; }
+        public static string Region { get; set; } = "ru";
         public static double CountError { get; set; }
         public static string countErrorToString { get; set; } = "0";
         public static int Seed { get; set; }

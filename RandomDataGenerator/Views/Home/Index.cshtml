@@ -1,21 +1,26 @@
 ﻿<div class="container mt-12">
     <div style="display:flex; flex-direction: column;">
-        @using (Html.BeginForm("RegenerateUsers", "Home"))
+        @using (Html.BeginForm("ErrorChanged", "Home"))
         {
             <p>Количество ошибок:</p>
-            <input type="range" name="amountRange" min="0" max="10" value="@DataGenerator.countErrorToString" step="0.25" oninput="this.form.amountInput.value=this.value" onchange="form.submit();"/>
+            <input type="range" name="amountRange" min="0" max="10" value="@DataGenerator.countErrorToString" step="0.25" oninput="this.form.amountInput.value=this.value" onchange="form.submit();" />
             <input type="number" name="amountInput" min="0" max="1000" value="@(DataGenerator.CountError)" oninput="this.form.amountRange.value=this.value" onchange="form.submit();" />
-            <br />
-             <p>Seed:</p>
-            <input type="number" name="seed" min="0" value="@DataGenerator.Seed" style="width: 26.5em; height: 2.5em" id="seed" onchange="form.submit();"/>
+        }
+        @using (Html.BeginForm("SeedOrRegionChanged", "Home"))
+        {
+            <p>Seed:</p>
+            <input type="number" name="seed" min="0" value="@DataGenerator.Seed" style="width: 26.5em; height: 2.5em" id="seed" onchange="form.submit();" />
             <button class="btn btn-primary" onclick="setRandomSeed();">Random</button>
             <br />
             <p>Выберите регион:</p>
-            <select value="@DataGenerator.Region" onchange="form.submit();" name="region">
+            <select onchange="form.submit();" name="region" id="selector">
                 <option value="@("ru")">Русский / Россия</option>
                 <option value="@("ua")">Yкраїнський / Україна</option>
                 <option value="@("be")">Беларускi / Беларусь</option>
             </select>
+            <script>
+                document.getElementById('selector').value = "@DataGenerator.Region";
+            </script>
         }
     </div>
     @if (DataGenerator.Users != null && DataGenerator.Users.Count > 0)
@@ -48,10 +53,15 @@
     }
 </div>
 <script>
-    function setRandomSeed() {
-        document.getElementById('seed').value = Math.floor(Math.random() * 10000);
-    };
-    function setNewUsers() {
+    function setRandomSeed()
+    {
+        if (document.getElementById('seed').value == @DataGenerator.Seed)
+        {
+            document.getElementById('seed').value = Math.floor(Math.random() * 10000);
+        }
+    }
+    function setNewUsers() 
+    {
         let windowRelativeBottom = document.getElementById('myTable').getBoundingClientRect().bottom;
         if (windowRelativeBottom - document.getElementById('myTable').scrollTop < 700)
         {

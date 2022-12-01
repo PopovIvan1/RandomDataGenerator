@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using RandomDataGenerator.Models;
 using System.Diagnostics;
 
@@ -47,22 +48,39 @@ namespace RandomDataGenerator.Controllers
             return result;
         }
 
-        public IActionResult RegenerateUsers(string amountInput, string seed, string region, string amountRange)
+        public IActionResult ErrorChanged(string amountInput, string amountRange)
         {
-            setDataGeneratorValues(amountInput, seed, region, amountRange);
+            if (amountInput == null)
+            {
+                DataGenerator.countErrorToString = "0";
+                DataGenerator.CountError = 0;
+            }
+            else
+            {
+                DataGenerator.countErrorToString = amountRange;
+                DataGenerator.CountError = Convert.ToDouble(amountInput.Replace('.', ','));
+            }
+            return setDataGeneratorValues();
+        }
+
+        public IActionResult SeedOrRegionChanged(string seed, string region)
+        {;
+            int number = 0;
+            bool isNumber = int.TryParse(seed, out number);
+            if (isNumber) DataGenerator.Seed = number;
+            else DataGenerator.Seed = 0;
+            DataGenerator.Region = region;
+            return setDataGeneratorValues();
+        }
+
+        private IActionResult setDataGeneratorValues()
+        {
+            DataGenerator.Page = 0;
+            if (DataGenerator.Region == null) DataGenerator.Region = "ru";
+            DataGenerator.Users = new List<User>();
             DataGenerator.Users = DataGenerator.GenerateUsers();
             DataGenerator.Users.AddRange(DataGenerator.GenerateUsers());
             return RedirectToAction("Index", "Home");
-        }
-
-        private void setDataGeneratorValues(string amountInput, string seed, string region, string amountRange)
-        {
-            DataGenerator.Page = 0;
-            DataGenerator.countErrorToString = amountRange;
-            DataGenerator.CountError = Convert.ToDouble(amountInput.Replace('.',','));
-            DataGenerator.Seed = int.Parse(seed);
-            DataGenerator.Region = region;
-            DataGenerator.Users = new List<User>();
         }
     }
 }
